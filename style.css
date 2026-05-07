@@ -7,6 +7,8 @@
     --btn-bg: #007bff;
     --btn-hover: #0056b3;
     --shadow-color: rgba(0, 0, 0, 0.1);
+    --input-bg: #fff;
+    --input-border: #ccc;
 }
 
 body.dark-mode {
@@ -18,6 +20,8 @@ body.dark-mode {
     --btn-bg: #375a7f;
     --btn-hover: #2b4764;
     --shadow-color: rgba(0, 0, 0, 0.5);
+    --input-bg: #3d3d3d;
+    --input-border: #555;
 }
 
 body {
@@ -79,6 +83,54 @@ h1 {
 
 #generate-btn:hover {
     background-color: var(--btn-hover);
+}
+
+.contact-section {
+    margin-top: 50px;
+    padding-top: 30px;
+    border-top: 1px solid var(--input-border);
+}
+
+.contact-section h2 {
+    color: var(--text-color);
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group input, .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    color: var(--text-color);
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.form-group textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+#submit-btn {
+    width: 100%;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#submit-btn:hover {
+    background-color: #218838;
 }
 
 .theme-toggle {
