@@ -1,24 +1,49 @@
+:root {
+    --bg-color: #f0f2f5;
+    --container-bg: #fff;
+    --text-color: #333;
+    --number-bg: #4CAF50;
+    --number-text: #fff;
+    --btn-bg: #007bff;
+    --btn-hover: #0056b3;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode {
+    --bg-color: #1a1a1a;
+    --container-bg: #2d2d2d;
+    --text-color: #f0f2f5;
+    --number-bg: #45a049;
+    --number-text: #e0e0e0;
+    --btn-bg: #375a7f;
+    --btn-hover: #2b4764;
+    --shadow-color: rgba(0, 0, 0, 0.5);
+}
+
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #f0f2f5;
+    background-color: var(--bg-color);
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .container {
     text-align: center;
-    background-color: #fff;
+    background-color: var(--container-bg);
     padding: 40px;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px var(--shadow-color);
+    transition: background-color 0.3s, box-shadow 0.3s;
 }
 
 h1 {
-    color: #333;
+    color: var(--text-color);
     margin-bottom: 30px;
+    transition: color 0.3s;
 }
 
 .lotto-numbers {
@@ -33,15 +58,16 @@ h1 {
     height: 50px;
     line-height: 50px;
     border-radius: 50%;
-    background-color: #4CAF50;
-    color: #fff;
+    background-color: var(--number-bg);
+    color: var(--number-text);
     font-size: 24px;
     font-weight: bold;
     margin: 0 10px;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 #generate-btn {
-    background-color: #007bff;
+    background-color: var(--btn-bg);
     color: #fff;
     border: none;
     padding: 15px 30px;
@@ -52,5 +78,21 @@ h1 {
 }
 
 #generate-btn:hover {
-    background-color: #0056b3;
+    background-color: var(--btn-hover);
+}
+
+.theme-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+#theme-btn {
+    background: none;
+    border: 1px solid var(--text-color);
+    color: var(--text-color);
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
 }
