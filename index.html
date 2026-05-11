@@ -1,43 +1,81 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lotto Number Generator</title>
+    <title>행운의 로또 번호 생성기 - 당신의 당첨을 기원합니다</title>
+    <meta name="description" content="미영이를 위한 특별한 로또 번호 생성기입니다. 행운의 숫자를 조합하고 당첨의 기회를 잡으세요. 로또 관련 팁과 정보를 함께 제공합니다.">
     <meta name="google-adsense-account" content="ca-pub-9237880355526261">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9237880355526261" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="theme-toggle">
-        <button id="theme-btn">Switch to Dark Mode</button>
-    </div>
-    <div class="container">
-        <h1>미영아 행운이 가득하길 빌어~</h1>
-        <p class="sub-heading">다른 준비도 하나씩 착착! 화이팅!</p>
-        <div id="lotto-sets-container">
-            <!-- Lotto sets will be generated here -->
-        </div>
-        <button id="generate-btn">미영이를 위한 행운의 번호</button>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="index.html" class="nav-logo">행운로또</a>
+                <ul class="nav-menu">
+                    <li><a href="index.html">홈</a></li>
+                    <li><a href="about.html">소개</a></li>
+                    <li><a href="privacy.html">개인정보처리방침</a></li>
+                </ul>
+                <div class="theme-toggle-nav">
+                    <button id="theme-btn">다크 모드</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="hero-section">
+            <h1>미영아 행운이 가득하길 빌어~</h1>
+            <p class="sub-heading">오늘의 운세를 숫자에 담아보세요. 화이팅!</p>
+            
+            <div id="lotto-sets-container">
+                <!-- Lotto sets will be generated here -->
+            </div>
+            
+            <div class="action-buttons">
+                <button id="generate-btn">행운의 번호 생성하기</button>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <div class="info-card">
+                <h3>💡 사용 방법</h3>
+                <p>번호 생성 버튼을 클릭하면 1부터 45까지의 숫자 중 중복되지 않는 6개의 숫자가 5세트 생성됩니다. 각 숫자는 실제 로또 공의 색상 규칙에 따라 시각적으로 구분되어 제공됩니다.</p>
+            </div>
+            
+            <div class="info-card">
+                <h3>📊 로또 상식 및 팁</h3>
+                <p>로또 6/45는 약 814만 분의 1의 당첨 확률을 가집니다. 통계적으로 자주 나오는 숫자(핫 넘버)와 드물게 나오는 숫자(콜드 넘버)를 적절히 조합하는 것이 재미있는 전략이 될 수 있습니다. 하지만 모든 조합은 독립적인 확률을 가짐을 잊지 마세요.</p>
+            </div>
+            
+            <div class="info-card">
+                <h3>⚠️ 책임 있는 게임</h3>
+                <p>로또는 재미와 희망을 위한 오락입니다. 과도한 몰입은 지양하시고, 본인의 경제적 상황에 맞는 건전한 구매 문화를 권장합니다. 행운은 마음의 여유에서 찾아옵니다.</p>
+            </div>
+        </section>
 
         <div class="feedback-section">
             <hr>
-            <h3>의견 남기기</h3>
+            <h3>💌 의견 남기기</h3>
             <form action="https://formspree.io/f/mzdoydwa" method="POST" id="feedback-form">
                 <div class="form-group">
-                    <label for="email">이메일 (답변을 원하시면 적어주세요)</label>
+                    <label for="email">이메일 (선택 사항)</label>
                     <input type="email" id="email" name="email" placeholder="example@email.com">
                 </div>
                 <div class="form-group">
                     <label for="message">의견</label>
                     <textarea id="message" name="message" required placeholder="응원의 한마디나 개선 의견을 남겨주세요!"></textarea>
                 </div>
-                <button type="submit" id="submit-btn">보내기</button>
+                <button type="submit" id="submit-btn">소중한 의견 보내기</button>
             </form>
         </div>
 
-        <div id="disqus_section" style="margin-top: 40px;">
+        <div id="disqus_section">
             <hr>
+            <h3>💬 커뮤니티 댓글</h3>
             <div id="disqus_thread"></div>
             <script>
                 var disqus_config = function () {
@@ -51,9 +89,19 @@
                     (d.head || d.body).appendChild(s);
                 })();
             </script>
-            <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
         </div>
-    </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <p>&copy; 2026 행운로또 생성기. All rights reserved.</p>
+            <ul class="footer-links">
+                <li><a href="about.html">사이트 소개</a></li>
+                <li><a href="privacy.html">개인정보처리방침</a></li>
+                <li><a href="terms.html">이용약관</a></li>
+            </ul>
+        </div>
+    </footer>
 
     <script>
         (function() {
@@ -65,8 +113,7 @@
 
                 function showError(msg) {
                     var errorDiv = document.createElement('div');
-                    errorDiv.style.color = 'red';
-                    errorDiv.style.marginTop = '10px';
+                    errorDiv.className = 'error-msg';
                     errorDiv.textContent = 'Error: ' + msg;
                     document.body.appendChild(errorDiv);
                 }
@@ -81,14 +128,14 @@
 
                     if (savedTheme === 'dark') {
                         body.classList.add('dark-mode');
-                        if (themeBtn) themeBtn.textContent = 'Switch to Light Mode';
+                        if (themeBtn) themeBtn.textContent = '라이트 모드';
                     }
 
                     if (themeBtn) {
                         themeBtn.addEventListener('click', function() {
                             body.classList.toggle('dark-mode');
                             var isDark = body.classList.contains('dark-mode');
-                            themeBtn.textContent = isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+                            themeBtn.textContent = isDark ? '라이트 모드' : '다크 모드';
                             try {
                                 localStorage.setItem('theme', isDark ? 'dark' : 'light');
                             } catch (e) {}
