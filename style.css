@@ -232,38 +232,95 @@ body.dark-mode .lotto-numbers {
     color: var(--secondary-color);
 }
 
-/* Weather Card */
+/* Weather Card Updated */
 .weather-card {
     background-color: var(--container-bg);
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 15px var(--shadow-color);
     border: 1px solid var(--border-color);
-    text-align: center;
 }
 
 .weather-card h3 {
     margin-top: 0;
     font-size: 18px;
     color: var(--primary-color);
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    text-align: center;
 }
 
-.weather-info p {
-    margin: 5px 0;
+#weather-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.weather-item {
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+body.dark-mode .weather-item {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.weather-item .city-name {
+    font-weight: 700;
     font-size: 14px;
+    margin-bottom: 5px;
+    display: block;
 }
 
-.weather-temp {
-    font-size: 24px;
+.weather-item .temp-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.weather-item .temp {
+    font-size: 18px;
     font-weight: 800;
-    margin: 10px 0;
+}
+
+.weather-item .desc {
+    font-size: 13px;
+    color: var(--secondary-color);
+}
+
+.weather-search {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px dashed var(--border-color);
+}
+
+.weather-search input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 13px;
+    background: var(--bg-color);
     color: var(--text-color);
 }
 
-.weather-desc {
-    color: var(--secondary-color);
-    text-transform: capitalize;
+.weather-search button {
+    padding: 8px 12px;
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.weather-search button:hover {
+    background: var(--primary-hover);
 }
 
 /* Feedback Section */
