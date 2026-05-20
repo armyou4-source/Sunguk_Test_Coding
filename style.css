@@ -323,6 +323,15 @@ body.dark-mode .weather-item {
     background: var(--primary-hover);
 }
 
+.weather-item.current-loc {
+    border: 1px solid var(--primary-color);
+    background: rgba(0, 123, 255, 0.05);
+}
+
+body.dark-mode .weather-item.current-loc {
+    background: rgba(55, 90, 127, 0.15);
+}
+
 /* Feedback Section */
 .feedback-section {
     background-color: var(--container-bg);

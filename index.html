@@ -238,11 +238,11 @@
                         }
                     }
 
-                    function createWeatherItem(data) {
+                    function createWeatherItem(data, isCurrent = false) {
                         const div = document.createElement('div');
-                        div.className = 'weather-item';
+                        div.className = 'weather-item' + (isCurrent ? ' current-loc' : '');
                         div.innerHTML = `
-                            <span class="city-name">${data.name}</span>
+                            <span class="city-name">${isCurrent ? '📍 현재 위치' : data.name}</span>
                             <div class="temp-info">
                                 <span class="temp">${data.temp}°C</span>
                                 <span class="desc">${data.desc}</span>
@@ -254,6 +254,22 @@
                     async function updateWeather() {
                         if (!weatherList) return;
                         weatherList.innerHTML = '';
+                        
+                        // Try to get current location first
+                        if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(async (position) => {
+                                const currentLocData = await fetchCityWeather({
+                                    name: '현재 위치',
+                                    lat: position.coords.latitude,
+                                    lon: position.coords.longitude
+                                });
+                                if (currentLocData) {
+                                    weatherList.prepend(createWeatherItem(currentLocData, true));
+                                }
+                            }, (err) => {
+                                console.warn('Geolocation error:', err);
+                            });
+                        }
                         
                         for (const city of defaultCities) {
                             const data = await fetchCityWeather(city);
@@ -271,7 +287,6 @@
                         citySearchBtn.textContent = '...';
 
                         try {
-                            // Geocoding API to find coordinates
                             const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&count=1&language=ko&format=json`);
                             const geoData = await geoRes.json();
 
