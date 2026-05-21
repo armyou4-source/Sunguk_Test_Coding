@@ -252,36 +252,52 @@
                     }
 
                     async function fetchCityWeather(city) {
-                        try {
-                            const grid = dfs_xy_conv(city.lat, city.lon);
-                            const kmaUrl = `http://www.kma.go.kr/wid/queryDFS.jsp?gridx=${grid.x}&gridy=${grid.y}`;
-                            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(kmaUrl)}`;
-                            
-                            const response = await fetch(proxyUrl);
-                            if (!response.ok) throw new Error('Proxy error');
-                            const proxyData = await response.json();
-                            
-                            const parser = new DOMParser();
-                            const xmlDoc = parser.parseFromString(proxyData.contents, "text/xml");
-                            
-                            const dataList = xmlDoc.getElementsByTagName("data");
-                            if (dataList.length === 0) throw new Error('KMA Data not found');
-                            const data = dataList[0];
+                        const grid = dfs_xy_conv(city.lat, city.lon);
+                        const kmaUrl = `https://www.kma.go.kr/wid/queryDFS.jsp?gridx=${grid.x}&gridy=${grid.y}`;
+                        
+                        // Try multiple proxies for reliability
+                        const proxies = [
+                            `https://api.allorigins.win/get?url=${encodeURIComponent(kmaUrl)}`,
+                            `https://corsproxy.io/?${encodeURIComponent(kmaUrl)}`
+                        ];
 
-                            return {
-                                name: city.name,
-                                lat: city.lat,
-                                lon: city.lon,
-                                temp: Math.round(parseFloat(data.getElementsByTagName("temp")[0].textContent)),
-                                desc: data.getElementsByTagName("wfKor")[0].textContent,
-                                humidity: data.getElementsByTagName("reh")[0].textContent,
-                                wind: data.getElementsByTagName("ws")[0].textContent.substring(0, 3),
-                                rain: data.getElementsByTagName("pop")[0].textContent
-                            };
-                        } catch (err) {
-                            console.error('KMA Fetch error:', err);
-                            return null;
+                        for (const proxyUrl of proxies) {
+                            try {
+                                const response = await fetch(proxyUrl);
+                                if (!response.ok) continue;
+                                
+                                let xmlText;
+                                if (proxyUrl.includes('allorigins')) {
+                                    const json = await response.json();
+                                    xmlText = json.contents;
+                                } else {
+                                    xmlText = await response.text();
+                                }
+
+                                if (!xmlText) continue;
+
+                                const parser = new DOMParser();
+                                const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+                                
+                                const dataList = xmlDoc.getElementsByTagName("data");
+                                if (dataList.length === 0) continue;
+                                const data = dataList[0];
+
+                                return {
+                                    name: city.name,
+                                    lat: city.lat,
+                                    lon: city.lon,
+                                    temp: Math.round(parseFloat(data.getElementsByTagName("temp")[0].textContent)),
+                                    desc: data.getElementsByTagName("wfKor")[0].textContent,
+                                    humidity: data.getElementsByTagName("reh")[0].textContent,
+                                    wind: data.getElementsByTagName("ws")[0].textContent.substring(0, 3),
+                                    rain: data.getElementsByTagName("pop")[0].textContent
+                                };
+                            } catch (err) {
+                                console.warn(`Proxy ${proxyUrl} failed:`, err);
+                            }
                         }
+                        return null;
                     }
 
                     function createWeatherItem(data, isCurrent = false) {
@@ -316,29 +332,42 @@
 
                     async function updateWeather() {
                         if (!weatherList) return;
-                        weatherList.innerHTML = '';
+                        weatherList.innerHTML = '<p>날씨 정보를 불러오는 중...</p>';
                         
+                        let loadedCount = 0;
+
+                        async function addWeatherItem(city, isCurrent = false) {
+                            const data = await fetchCityWeather(city);
+                            if (data) {
+                                if (loadedCount === 0) weatherList.innerHTML = '';
+                                const item = createWeatherItem(data, isCurrent);
+                                if (isCurrent) weatherList.prepend(item);
+                                else weatherList.appendChild(item);
+                                loadedCount++;
+                            }
+                        }
+
                         if (navigator.geolocation) {
                             navigator.geolocation.getCurrentPosition(async (position) => {
-                                const currentLocData = await fetchCityWeather({
+                                await addWeatherItem({
                                     name: '현재 위치',
                                     lat: position.coords.latitude,
                                     lon: position.coords.longitude
-                                });
-                                if (currentLocData) {
-                                    weatherList.prepend(createWeatherItem(currentLocData, true));
-                                }
+                                }, true);
                             }, (err) => {
                                 console.warn('Geolocation error:', err);
                             });
                         }
                         
                         for (const city of defaultCities) {
-                            const data = await fetchCityWeather(city);
-                            if (data) {
-                                weatherList.appendChild(createWeatherItem(data));
-                            }
+                            await addWeatherItem(city);
                         }
+
+                        setTimeout(() => {
+                            if (loadedCount === 0) {
+                                weatherList.innerHTML = '<p>날씨 정보를 가져올 수 없습니다. 프록시 서버 확인이 필요합니다.</p>';
+                            }
+                        }, 8000);
                     }
 
                     async function searchCity() {
