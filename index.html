@@ -106,34 +106,7 @@
         </div>
     </main>
 
-    <!-- Weather Detail Modal -->
-    <div id="weather-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <div class="weather-detail-header">
-                <h2 id="modal-city-name">도시 이름</h2>
-                <p id="modal-weather-desc">날씨 상태</p>
-            </div>
-            <div class="weather-detail-grid">
-                <div class="detail-item">
-                    <span class="detail-label">현재 기온</span>
-                    <span class="detail-value" id="modal-temp">-°C</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">습도</span>
-                    <span class="detail-value" id="modal-humidity">-%</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">풍속</span>
-                    <span class="detail-value" id="modal-wind">0m/s</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">강수량</span>
-                    <span class="detail-value" id="modal-rain">0mm</span>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Weather Detail Modal removed and replaced by inline details -->
 
     <footer class="site-footer">
         <div class="footer-container">
@@ -233,8 +206,6 @@
                     const weatherList = document.getElementById('weather-list');
                     const cityInput = document.getElementById('city-input');
                     const citySearchBtn = document.getElementById('city-search-btn');
-                    const weatherModal = document.getElementById('weather-modal');
-                    const closeModal = document.querySelector('.close-modal');
 
                     const defaultCities = [
                         { name: '서울', lat: 37.5665, lon: 126.9780 },
@@ -280,16 +251,6 @@
                         }
                     }
 
-                    function showWeatherDetail(data) {
-                        document.getElementById('modal-city-name').textContent = data.name;
-                        document.getElementById('modal-weather-desc').textContent = data.desc;
-                        document.getElementById('modal-temp').textContent = data.temp + '°C';
-                        document.getElementById('modal-humidity').textContent = data.humidity + '%';
-                        document.getElementById('modal-wind').textContent = data.wind + 'm/s';
-                        document.getElementById('modal-rain').textContent = data.rain + 'mm';
-                        weatherModal.style.display = 'block';
-                    }
-
                     function createWeatherItem(data, isCurrent = false) {
                         const div = document.createElement('div');
                         div.className = 'weather-item' + (isCurrent ? ' current-loc' : '');
@@ -299,8 +260,25 @@
                                 <span class="temp">${data.temp}°C</span>
                                 <span class="desc">${data.desc}</span>
                             </div>
+                            <div class="weather-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">습도</span>
+                                    <span class="detail-value">${data.humidity}%</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">풍속</span>
+                                    <span class="detail-value">${data.wind}m/s</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">강수량</span>
+                                    <span class="detail-value">${data.rain}mm</span>
+                                </div>
+                            </div>
                         `;
-                        div.addEventListener('click', () => showWeatherDetail(data));
+                        div.addEventListener('click', () => {
+                            // Close other items if needed, but here we just toggle
+                            div.classList.toggle('active');
+                        });
                         return div;
                     }
 
@@ -372,13 +350,6 @@
                             if (e.key === 'Enter') searchCity();
                         });
                     }
-
-                    if (closeModal) {
-                        closeModal.onclick = () => weatherModal.style.display = 'none';
-                    }
-                    window.onclick = (event) => {
-                        if (event.target == weatherModal) weatherModal.style.display = 'none';
-                    };
 
                     updateWeather();
 
