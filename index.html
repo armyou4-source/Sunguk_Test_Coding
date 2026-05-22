@@ -213,132 +213,52 @@
                         { name: '파주', lat: 37.7600, lon: 126.7800 }
                     ];
 
-                    // KMA Coordinate Conversion
-                    function dfs_xy_conv(lat, lon) {
-                        const RE = 6371.00877; // 지구 반경(km)
-                        const GRID = 5.0; // 격자 간격(km)
-                        const SLAT1 = 30.0; // 투영 위도1(degree)
-                        const SLAT2 = 60.0; // 투영 위도2(degree)
-                        const OLON = 126.0; // 기준점 경도(degree)
-                        const OLAT = 38.0; // 기준점 위도(degree)
-                        const XO = 43; // 기준점 X좌표(GRID)
-                        const YO = 136; // 기준점 Y좌표(GRID)
-
-                        const DEGRAD = Math.PI / 180.0;
-                        const re = RE / GRID;
-                        const slat1 = SLAT1 * DEGRAD;
-                        const slat2 = SLAT2 * DEGRAD;
-                        const olon = OLON * DEGRAD;
-                        const olat = OLAT * DEGRAD;
-
-                        let sn = Math.tan(Math.PI * 0.25 + slat2 * 0.5) / Math.tan(Math.PI * 0.25 + slat1 * 0.5);
-                        sn = Math.log(Math.cos(slat1) / Math.cos(slat2)) / Math.log(sn);
-                        let sf = Math.tan(Math.PI * 0.25 + slat1 * 0.5);
-                        sf = Math.pow(sf, sn) * Math.cos(slat1) / sn;
-                        let ro = Math.tan(Math.PI * 0.25 + olat * 0.5);
-                        ro = re * sf / Math.pow(ro, sn);
-                        
-                        let ra = Math.tan(Math.PI * 0.25 + (lat) * DEGRAD * 0.5);
-                        ra = re * sf / Math.pow(ra, sn);
-                        let theta = lon * DEGRAD - olon;
-                        if (theta > Math.PI) theta -= 2.0 * Math.PI;
-                        if (theta < -Math.PI) theta += 2.0 * Math.PI;
-                        theta *= sn;
-                        
-                        return {
-                            x: Math.floor(ra * Math.sin(theta) + XO + 0.5),
-                            y: Math.floor(ro - ra * Math.cos(theta) + YO + 0.5)
-                        };
-                    }
-
-                    const authKey = 'f9922fd2914c6cb0fa37c4a7b807530d9d7f82e8f0d0322513158090dd69e333';
-
-                    function getKmaBaseTime() {
-                        const now = new Date();
-                        // KST is UTC+9
-                        const kst = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (9 * 3600000));
-                        let date = kst.toISOString().substring(0, 10).replace(/-/g, '');
-                        let hour = kst.getHours();
-                        let minute = kst.getMinutes();
-
-                        // Base times for VilageFcst: 02, 05, 08, 11, 14, 17, 20, 23
-                        // Data available 10 mins after the hour
-                        const baseTimes = [2, 5, 8, 11, 14, 17, 20, 23];
-                        let baseTime = '2300';
-                        
-                        if (hour < 2 || (hour === 2 && minute < 10)) {
-                            const yesterday = new Date(kst.getTime() - 86400000);
-                            date = yesterday.toISOString().substring(0, 10).replace(/-/g, '');
-                            baseTime = '2300';
-                        } else {
-                            for (let i = baseTimes.length - 1; i >= 0; i--) {
-                                if (hour > baseTimes[i] || (hour === baseTimes[i] && minute >= 10)) {
-                                    baseTime = baseTimes[i].toString().padStart(2, '0') + '00';
-                                    break;
-                                }
-                            }
-                        }
-                        return { baseDate: date, baseTime: baseTime };
-                    }
-
-                    const skyMap = { '1': '맑음', '3': '구름많음', '4': '흐림' };
-                    const ptyMap = { '0': '', '1': '비', '2': '비/눈', '3': '눈', '4': '소나기' };
+                    const weatherCodeMap = {
+                        0: '맑음',
+                        1: '대체로 맑음',
+                        2: '구름 조금',
+                        3: '흐림',
+                        45: '안개',
+                        48: '서리 안개',
+                        51: '가벼운 이슬비',
+                        53: '이슬비',
+                        55: '진한 이슬비',
+                        61: '약한 비',
+                        63: '비',
+                        65: '강한 비',
+                        71: '약한 눈',
+                        73: '눈',
+                        75: '강한 눈',
+                        80: '소나기',
+                        81: '강한 소나기',
+                        82: '격렬한 소나기',
+                        95: '천둥번개'
+                    };
 
                     async function fetchCityWeather(city) {
-                        const grid = dfs_xy_conv(city.lat, city.lon);
-                        const { baseDate, baseTime } = getKmaBaseTime();
+                        const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,precipitation&timezone=auto`;
                         
-                        const kmaUrl = `https://apihub.kma.go.kr/api/typ02/openApi/VilageFcstInfoService_2.0/getVilageFcst?pageNo=1&numOfRows=20&dataType=JSON&base_date=${baseDate}&base_time=${baseTime}&nx=${grid.x}&ny=${grid.y}&authKey=${authKey}`;
-                        
-                        const proxies = [
-                            `https://api.allorigins.win/get?url=${encodeURIComponent(kmaUrl)}`,
-                            `https://corsproxy.io/?${encodeURIComponent(kmaUrl)}`
-                        ];
+                        try {
+                            const response = await fetch(url);
+                            if (!response.ok) return null;
+                            
+                            const data = await response.json();
+                            const current = data.current;
 
-                        for (const proxyUrl of proxies) {
-                            try {
-                                const response = await fetch(proxyUrl);
-                                if (!response.ok) continue;
-                                
-                                let json;
-                                if (proxyUrl.includes('allorigins')) {
-                                    const outerJson = await response.json();
-                                    json = JSON.parse(outerJson.contents);
-                                } else {
-                                    json = await response.json();
-                                }
-
-                                if (!json.response || !json.response.body || !json.response.body.items) continue;
-
-                                const items = json.response.body.items.item;
-                                const weatherData = {};
-                                const firstTime = items[0].fcstTime;
-                                
-                                items.forEach(item => {
-                                    if (item.fcstTime === firstTime) {
-                                        weatherData[item.category] = item.fcstValue;
-                                    }
-                                });
-
-                                const sky = skyMap[weatherData.SKY] || '알 수 없음';
-                                const pty = ptyMap[weatherData.PTY] || '';
-                                const desc = pty ? `${sky}(${pty})` : sky;
-
-                                return {
-                                    name: city.name,
-                                    lat: city.lat,
-                                    lon: city.lon,
-                                    temp: Math.round(parseFloat(weatherData.TMP)),
-                                    desc: desc,
-                                    humidity: weatherData.REH,
-                                    wind: weatherData.WSD,
-                                    rain: weatherData.POP
-                                };
-                            } catch (err) {
-                                console.warn(`Proxy ${proxyUrl} failed:`, err);
-                            }
+                            return {
+                                name: city.name,
+                                lat: city.lat,
+                                lon: city.lon,
+                                temp: Math.round(current.temperature_2m),
+                                desc: weatherCodeMap[current.weather_code] || '알 수 없음',
+                                humidity: current.relative_humidity_2m,
+                                wind: current.wind_speed_10m,
+                                rain: current.precipitation
+                            };
+                        } catch (err) {
+                            console.warn(`Weather fetch failed for ${city.name}:`, err);
+                            return null;
                         }
-                        return null;
                     }
 
                     function createWeatherItem(data, isCurrent = false) {
@@ -360,8 +280,8 @@
                                     <span class="detail-value">${data.wind}m/s</span>
                                 </div>
                                 <div class="detail-item">
-                                    <span class="detail-label">강수확률</span>
-                                    <span class="detail-value">${data.rain}%</span>
+                                    <span class="detail-label">강수량</span>
+                                    <span class="detail-value">${data.rain}mm</span>
                                 </div>
                             </div>
                         `;
@@ -397,6 +317,7 @@
                                 }, true);
                             }, (err) => {
                                 console.warn('Geolocation error:', err);
+                                // Fallback to default cities if geolocation fails
                             });
                         }
                         
@@ -406,7 +327,7 @@
 
                         setTimeout(() => {
                             if (loadedCount === 0) {
-                                weatherList.innerHTML = '<p>날씨 정보를 가져올 수 없습니다. API 키 및 프록시 확인이 필요합니다.</p>';
+                                weatherList.innerHTML = '<p>날씨 정보를 가져올 수 없습니다. 네트워크 연결을 확인해주세요.</p>';
                             }
                         }, 10000);
                     }
@@ -435,6 +356,7 @@
                             });
 
                             if (cityData) {
+                                // Add to list if not already there or just append
                                 weatherList.appendChild(createWeatherItem(cityData));
                                 cityInput.value = '';
                             }
